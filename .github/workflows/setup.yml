@@ -47,6 +47,6 @@ jobs:
         working-directory: SUSTechOS
         run: make
 
-      - name: Run QEMU
+      - name: Run QEMU (1min)
         working-directory: SUSTechOS
-        run: make run
+        run: timeout 60 make run
