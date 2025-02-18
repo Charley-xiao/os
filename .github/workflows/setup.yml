@@ -1,0 +1,57 @@
+name: Experimental Environment Setup
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Check out your repository
+      - uses: actions/checkout@v3
+
+      # 2. Install dependencies (RISC-V cross-tools, QEMU, GDB, etc.)
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            gcc-riscv64-unknown-elf \
+            qemu-system-misc \
+            gdb-multiarch \
+            make \
+            cmake \
+            python3-pip \
+            elfutils
+
+      # 3. Confirm the installed tool versions
+      - name: Print Tool Versions
+        run: |
+          echo "=== GCC RISC-V ==="
+          riscv64-unknown-elf-gcc --version
+          echo "=== QEMU ==="
+          qemu-system-riscv64 --version
+          echo "=== GDB multiarch ==="
+          gdb-multiarch --version
+
+      # 4. Clone the SUSTechOS-2025S-user repo (if you do not keep it in the same repo)
+      - name: Clone user repo
+        run: |
+          git clone https://github.com/yuk1i/SUSTechOS
+          cd SUSTechOS
+          git clone https://github.com/yuk1i/SUSTechOS-2025S-user user
+
+      # 5. Build the user programs
+      - name: Build user programs
+        run: make user
+
+      # 6. Build the kernel
+      - name: Build kernel
+        run: make
+
+      # 7. Run QEMU (headless)
+      #    Adjust any QEMU flags to ensure it runs in a way suitable for CI.
+      - name: Run QEMU
+        run: make run
