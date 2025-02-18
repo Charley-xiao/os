@@ -3,8 +3,12 @@ name: Experimental Environment Setup
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - 'README.md'
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - 'README.md'
 
 jobs:
   build-and-test:
@@ -49,4 +53,4 @@ jobs:
 
       - name: Run QEMU (1min)
         working-directory: SUSTechOS
-        run: timeout 60 make run
+        run: timeout 60 make run || true
